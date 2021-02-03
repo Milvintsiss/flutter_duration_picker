@@ -31,6 +31,7 @@ class _DialPainter extends CustomPainter {
     @required this.labels,
     @required this.backgroundColor,
     @required this.accentColor,
+    @required this.circleColor,
     @required this.theta,
     @required this.textDirection,
     @required this.selectedValue,
@@ -42,6 +43,7 @@ class _DialPainter extends CustomPainter {
   final List<TextPainter> labels;
   final Color backgroundColor;
   final Color accentColor;
+  final Color circleColor;
   final double theta;
   final TextDirection textDirection;
   final int selectedValue;
@@ -74,8 +76,8 @@ class _DialPainter extends CustomPainter {
     }
 
     // Draw the inner background circle
-    canvas.drawCircle(centerPoint, radius * 0.88,
-        new Paint()..color = Theme.of(context).canvasColor);
+    canvas.drawCircle(
+        centerPoint, radius * 0.88, new Paint()..color = circleColor);
 
     // Get the offset point for an angle value of theta, and a distance of _radius
     Offset getOffsetForTheta(double theta, double _radius) {
@@ -98,7 +100,7 @@ class _DialPainter extends CustomPainter {
         textAlign: TextAlign.center,
         text: new TextSpan(
 //            text: '${hours}${minutes > 0 ? minutes : ""}',
-            text: '${hours}${minutes}',
+            text: '$hours$minutes',
             style: Theme.of(context)
                 .textTheme
                 .display3
@@ -110,20 +112,20 @@ class _DialPainter extends CustomPainter {
         centerPoint.dy - textDurationValuePainter.height / 2);
     textDurationValuePainter.paint(canvas, middleForValueText);
 
-    TextPainter textMinPainter = new TextPainter(
-        textAlign: TextAlign.center,
-        text: new TextSpan(
-            text: 'min.', //th: ${theta}',
-            style: Theme.of(context).textTheme.body1),
-        textDirection: TextDirection.ltr)
-      ..layout();
-    textMinPainter.paint(
-        canvas,
-        new Offset(
-            centerPoint.dx - (textMinPainter.width / 2),
-            centerPoint.dy +
-                (textDurationValuePainter.height / 2) -
-                textMinPainter.height / 2));
+    // TextPainter textMinPainter = new TextPainter(
+    //     textAlign: TextAlign.center,
+    //     text: new TextSpan(
+    //         text: 'min.', //th: ${theta}',
+    //         style: Theme.of(context).textTheme.body1),
+    //     textDirection: TextDirection.ltr)
+    //   ..layout();
+    // textMinPainter.paint(
+    //     canvas,
+    //     new Offset(
+    //         centerPoint.dx - (textMinPainter.width / 2),
+    //         centerPoint.dy +
+    //             (textDurationValuePainter.height / 2) -
+    //             textMinPainter.height / 2));
 
     // Draw an arc around the circle for the amount of the circle that has elapsed.
     var elapsedPainter = new Paint()
@@ -177,9 +179,10 @@ class _Dial extends StatefulWidget {
   const _Dial(
       {@required this.duration,
       @required this.onChanged,
+      @required this.circleColor,
       this.snapToMins = 1.0})
       : assert(duration != null);
-
+  final Color circleColor;
   final Duration duration;
   final ValueChanged<Duration> onChanged;
 
@@ -499,6 +502,7 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
             labels: _buildMinutes(theme.textTheme),
             backgroundColor: backgroundColor,
             accentColor: themeData.accentColor,
+            circleColor: widget.circleColor,
             theta: _theta.value,
             textDirection: Directionality.of(context),
           ),
@@ -516,18 +520,20 @@ class _DurationPickerDialog extends StatefulWidget {
   /// Creates a duration picker.
   ///
   /// [initialTime] must not be null.
-  const _DurationPickerDialog({
-    Key key,
-    @required this.initialTime,
-    this.snapToMins,
-    this.boxDecoration,
-  })  : assert(initialTime != null),
+  const _DurationPickerDialog(
+      {Key key,
+      @required this.initialTime,
+      this.snapToMins,
+      this.boxDecoration,
+      this.circleColor})
+      : assert(initialTime != null),
         super(key: key);
 
   /// The duration initially selected when the dialog is shown.
   final Duration initialTime;
   final double snapToMins;
   final BoxDecoration boxDecoration;
+  final Color circleColor;
 
   @override
   _DurationPickerDialogState createState() => new _DurationPickerDialogState();
@@ -580,6 +586,7 @@ class _DurationPickerDialogState extends State<_DurationPickerDialog> {
               duration: _selectedDuration,
               onChanged: _handleTimeChanged,
               snapToMins: widget.snapToMins,
+              circleColor: widget.circleColor ?? Theme.of(context).canvasColor,
             )));
 
     final Widget actions = new ButtonTheme.bar(
@@ -666,7 +673,8 @@ Future<Duration> showDurationPicker(
     {@required BuildContext context,
     @required Duration initialTime,
     double snapToMins,
-    BoxDecoration boxDecoration}) async {
+    BoxDecoration boxDecoration,
+    Color circleColor}) async {
   assert(context != null);
   assert(initialTime != null);
 
@@ -676,6 +684,7 @@ Future<Duration> showDurationPicker(
       initialTime: initialTime,
       snapToMins: snapToMins,
       boxDecoration: boxDecoration,
+      circleColor: circleColor,
     ),
   );
 }
@@ -688,12 +697,15 @@ class DurationPicker extends StatelessWidget {
   final double width;
   final double height;
 
+  final Color circleColor;
+
   DurationPicker(
       {this.duration = const Duration(minutes: 0),
       @required this.onChange,
       this.snapToMins,
       this.width,
-      this.height});
+      this.height,
+      this.circleColor});
 
   @override
   Widget build(BuildContext context) {
@@ -709,6 +721,7 @@ class DurationPicker extends StatelessWidget {
                   duration: duration,
                   onChanged: onChange,
                   snapToMins: snapToMins,
+                  circleColor: circleColor ?? Theme.of(context).canvasColor,
                 ),
               ),
             ]));
