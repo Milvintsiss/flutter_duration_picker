@@ -1,3 +1,9 @@
+## [2.0.0] - Mar 08, 2021
+
+* migrate to null safety
+* Removed deprecated widgets
+* circleColor property
+
 ## [1.0.4] - Oct 23, 2018
 
 * Fixed bug showing 60mins when approaching 0.

@@ -8,7 +8,7 @@ A little widget for picking durations. Heavily inspired from the Material Design
 
 ```yaml
 dependencies:
-  flutter_duration_picker: "^1.0.4"
+  flutter_duration_picker: "^2.0.0"
 ```
 
 ```dart
@@ -91,7 +91,7 @@ If you want to add BoxDecoration to pop up Duration Picker you can use like belo
 ```dart
 showDurationPicker(
   context: context,
-  initialTime: Duration(minites: 30),
+  initialTime: Duration(minutes: 30),
   boxDecoration: BoxDecoration(
     color: Colors.white,
     borderRadius: BorderRadius.circular(5)
